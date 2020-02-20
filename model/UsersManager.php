@@ -3,30 +3,31 @@ require_once('Manager.php');
 
 class UsersManager extends Manager
 {
-    public function passwordVerify($username, $passwordHash)
+    public function passwordVerify($username, $password)
     {
         $db = $this->dbConnect();
-        $req = $db->prepare('SELECT id, username, passwordhash FROM users WHERE username = :username');
+        $req = $db->prepare('SELECT id_user, nom, prenom, username, password FROM users WHERE username = :username');
         $req->execute(array('username' => $username));
-        $user = $req->fetch();
+        $userdata = $req->fetch();
 
-        return $user;
+        return $userdata;
     }
 
-    public function userConnect($username, $id, $hash)
+    public function userConnect($username, $id, $hash, $firstname, $lastname)
     {
+        setcookie('firstname', $firstname, time() +30*24*3600, null, null, false, true);
+        setcookie('lastname', $lastname, time() + 30*24*3600, null, null, false, true);
         setcookie('username', $username, time() + 30*24*3600, null, null, false, true);
         setcookie('hash', $hash, time() + 30*24*3600, null, null, false, true);
         $_SESSION['id'] = $id;
         $_SESSION['username'] = $username;
     }
 
-    public function userVerify($userName, $firstName, $lastName, $email)
+    public function userVerify($userName, $firstName, $lastName)
     {
         $db = $this->dbConnect();
-        $req = $db->prepare('SELECT username, firstname, lastname, email FROM users WHERE email = :email OR username= :username OR (firstname = :firstname AND lastname = :lastname)');
+        $req = $db->prepare('SELECT nom, prenom, username FROM users WHERE username= :username OR (prenom = :firstname AND nom = :lastname)');
         $req->execute(array(
-            'email' => $email,
             'username' => $userName,
             'firstname' => $firstName,
             'lastname' => $lastName
@@ -36,20 +37,49 @@ class UsersManager extends Manager
         return $data;
     }
 
-    public function userRegister($username, $firstname, $lastname, $password, $email)
+    public function userRegister($lastname, $firstname, $username, $password, $question, $answer)
     {
         $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+        $answer = password_hash($answer, PASSWORD_DEFAULT);
 
         $db = $this->dbConnect();
-        $req = $db->prepare('INSERT INTO users(username, firstname, lastname, passwordhash, email) VALUES (:username, :firstname, :lastname, :passwordhash, :email)');
+        $req = $db->prepare('INSERT INTO users(nom, prenom, username, password, question, reponse ) VALUES ( :lastname, :firstname, :username, :passwordhash, :question, :answer)');
         $userdata = $req->execute(array(
                             'username' => $username,
                             'firstname' => $firstname,
                             'lastname' => $lastname,
                             'passwordhash' => $passwordHash,
-                            'email' => $email
+                            'question' => $question,
+                            'answer' => $answer
                             ));
         return $userdata;
 
     }
+
+    public function masterPasswordVerify($username, $password)
+    {
+        $db = $this->dbConnect();
+        $req = $db->prepare('SELECT username, password FROM protection WHERE username = :username');
+        $req->execute(array('username' => $username));
+
+        $userdata = $req->fetch();
+
+        if($userdata)
+        {
+            $ispasswordcorrect = password_verify($password, $userdata['password']);
+            $hash = password_hash($username . time() . $password, PASSWORD_DEFAULT);
+
+            if($ispasswordcorrect){$this->authorisation($hash);}
+            else{throw new Exception('Mauvais username ou mot de passe');}
+
+        }
+        else{throw new Exception('Mauvais username ou mot de passe');}
+
+    }
+
+    private function authorisation($hash)
+    {
+        setcookie('unprotected', $hash, time() + 30*24*3600, null, null, false, true);
+    }
+
 }

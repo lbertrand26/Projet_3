@@ -2,13 +2,27 @@
 require_once('model/UsersManager.php');
 
 
+function unprotect($username, $password)
+{
+    $usersManager = new UsersManager();
+    $userdata = $usersManager->masterPasswordVerify($username, $password);
 
+    if($userdata)
+    {
+        throw new Exception('Problème de connexion');
+    }
+    else
+    {
+        header('Location: index.php');
+    }
 
-function registerUser($username, $firstname, $lastname, $password, $email)
+}
+
+function registerUser($username, $firstname, $lastname, $password, $question, $answer)
 {
 
     $usersManager = new UsersManager();
-    $data = $usersManager->userVerify($username, $firstname, $lastname, $email);
+    $data = $usersManager->userVerify($username, $firstname, $lastname);
 
     if($data['username'] == $username)
     {
@@ -16,19 +30,13 @@ function registerUser($username, $firstname, $lastname, $password, $email)
         throw new Exception('Nom d\'utilisateur déjà utilisé');
     }
 
-    if($data['firstname'] == $firstname && $data['lastname'] == $lastame)
+    if($data['firstname'] == $firstname && $data['lastname'] == $lastname)
     {
         require('view/frontend/newUserView.php');
         throw new Exception('Nom et Prénom déjà enregistrés !');
     }
 
-    if ($data['email'] == $email)
-    {
-        require('view/frontend/newUserView.php');
-        throw new Exception('email déjà utilisé');
-    }
-
-    $userdata = $usersManager->userRegister($username, $firstname, $lastname, $password, $email);
+    $userdata = $usersManager->userRegister($lastname, $firstname, $username, $password, $question, $answer);
 
     if(!$userdata)
     {
@@ -44,7 +52,7 @@ function connectUser($username, $password)
     $usersManager = new UsersManager();
     $userdata = $usersManager->passwordVerify($username, $password);
 
-    $isPasswordCorrect = password_verify($password, $userdata['passwordhash']);
+    $isPasswordCorrect = password_verify($password, $userdata['password']);
 
     if(!$userdata)
     {
@@ -53,8 +61,8 @@ function connectUser($username, $password)
 
     if($isPasswordCorrect)
     {
-        $usersManager->userConnect($username, $userdata['id'], $userdata['passwordhash']);
+        $usersManager->userConnect($username, $userdata['id_user'], $userdata['password'], $userdata['prenom'], $userdata['nom']);
         header('Location:index.php');
     }
-    else{throw new Exception('mauvais identifiant ou mot de passe !');}
+    else{throw new Exception('Mauvais identifiant ou mot de passe !');}
 }
