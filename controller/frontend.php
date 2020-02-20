@@ -2,10 +2,7 @@
 require_once('model/UsersManager.php');
 
 
-function test()
-{
-    require('view/frontend/connectView.php');
-}
+
 
 function registerUser($username, $firstname, $lastname, $password, $email)
 {
@@ -56,8 +53,8 @@ function connectUser($username, $password)
 
     if($isPasswordCorrect)
     {
-        $usersManager->userConnect($username, $userdata['id']);
-        echo 'Vous etes connecté';
+        $usersManager->userConnect($username, $userdata['id'], $userdata['passwordhash']);
+        header('Location:index.php');
     }
-    else{throw new Exception('erreur de mdp');}
+    else{throw new Exception('mauvais identifiant ou mot de passe !');}
 }

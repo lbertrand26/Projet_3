@@ -4,6 +4,11 @@ require('controller/frontend.php');
 
 try
 {
+    if (isset($_COOKIE['username']) && isset($_COOKIE['hash']))
+    {
+        require('view/frontend/connectedView.php');
+    }
+
     if(isset($_GET['action']))
     {
         if($_GET['action'] == 'test')
@@ -22,7 +27,7 @@ try
             }
         }
 
-        if($_GET['action'] == 'connect')
+        elseif($_GET['action'] == 'connect')
         {
             if (!empty($_POST['username']) && !empty($_POST['password']))
             {
@@ -35,17 +40,18 @@ try
             }
         }
         
-        if($_GET['action'] == 'deconnect')
+        elseif($_GET['action'] == 'deconnect')
         {
             session_destroy();
             setcookie('username', "", time() - 3600);
-            require('view/frontend/connectView.php');
+            header('Location: index.php');
             echo 'Vous êtes maintenant déconnecté';
         }
+
     }
     else
     {
-        test();
+        require('view/frontend/connectView.php');
     }
 }
 

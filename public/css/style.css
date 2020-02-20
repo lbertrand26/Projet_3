@@ -1,0 +1,75 @@
+body {
+    width: 80%;
+    margin: auto;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-height: 10%;
+    padding: 1%;
+    border-bottom: 1px solid black;
+}
+
+header p {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-self: flex-start;
+    align-items: center;
+}
+
+header #logo_gbaf {
+    width: 15%;
+    height: 15%;
+}
+
+section {
+    text-align: center;
+    border-bottom: 1px solid black;
+}
+
+#bloc_acteurs {
+    border: 1px solid black;
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.acteur {
+    border: 1px solid red;
+    margin: 8px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.acteur a {
+    align-self: flex-end;
+    margin: 8px 8px 8px 0;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 2px 4px 2px 4px;
+    text-decoration: none;
+}
+
+.acteur img {
+    padding: 8px;
+}
+
+.contenu_acteurs {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    flex-grow: 2;
+}
+
+footer {
+    display: flex;
+    justify-content: center;
+}

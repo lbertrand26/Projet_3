@@ -13,9 +13,10 @@ class UsersManager extends Manager
         return $user;
     }
 
-    public function userConnect($username, $id)
+    public function userConnect($username, $id, $hash)
     {
         setcookie('username', $username, time() + 30*24*3600, null, null, false, true);
+        setcookie('hash', $hash, time() + 30*24*3600, null, null, false, true);
         $_SESSION['id'] = $id;
         $_SESSION['username'] = $username;
     }
