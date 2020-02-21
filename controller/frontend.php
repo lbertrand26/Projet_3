@@ -1,21 +1,27 @@
 <?php
 require_once('model/UsersManager.php');
+require_once('model/ActorsManager.php');
+require_once('model/CommentsManager.php');
 
 
-function unprotect($username, $password)
+
+function connect()
 {
-    $usersManager = new UsersManager();
-    $userdata = $usersManager->masterPasswordVerify($username, $password);
+    require('view/frontend/connectView.php');
+}
 
-    if($userdata)
-    {
-        throw new Exception('Problème de connexion');
-    }
-    else
-    {
-        header('Location: index.php');
-    }
+function register()
+{
+    require('view/frontend/newUserView.php');
+}
 
+function destroyCookies()
+{
+    setcookie('firstname');
+    setcookie('lastname');
+    setcookie('username');
+    setcookie('hash');
+    header('Location: index.php');
 }
 
 function registerUser($username, $firstname, $lastname, $password, $question, $answer)
@@ -62,7 +68,42 @@ function connectUser($username, $password)
     if($isPasswordCorrect)
     {
         $usersManager->userConnect($username, $userdata['id_user'], $userdata['password'], $userdata['prenom'], $userdata['nom']);
-        header('Location:index.php');
+        header('Location: index.php');
     }
     else{throw new Exception('Mauvais identifiant ou mot de passe !');}
+}
+
+function listActors()
+{
+    $actorsManager = new ActorsManager();
+    $actors = $actorsManager->getActors();
+
+    require('view/frontend/connectedView.php');
+}
+
+function showActor()
+{
+    $actorsManager = new ActorsManager();
+    $commentsManager = new CommentsManager();
+
+    $actor = $actorsManager->getActor($_GET['id']);
+    $comments = $commentsManager->getComments($_GET['id']);
+
+    require('view/frontend/actorView.php');
+}
+
+function addComment($userId, $actorId, $com)
+{
+
+    $com = htmlspecialchars($_POST['comment']);
+    $commentsManager = new CommentsManager();
+
+    $comment = $commentsManager->setComment($userId, $actorId, $com);
+
+    if ($commentPosted === false) {
+        throw new Exception('Impossible d\'ajouter le commentaire !');
+    }
+    else {
+        header('Location: index.php?action=actor&id=' . $actorId);
+    }
 }

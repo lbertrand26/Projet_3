@@ -1,4 +1,6 @@
-<?php ob_start(); ?>
+<?php
+session_start();
+ob_start(); ?>
 
 <section id="presentation">
     <h1>Présentation du GBAF</h1>
@@ -9,22 +11,23 @@
     <h2>Acteurs/Partenaires</h2>
     <p>Texte acteurs et partenaires</p>
     <div id="bloc_acteurs">
-        <div class="acteur">
-            <img src="acteur1.png" alt="acteur_1" />
-            <div class="contenu_acteurs">
-                <h3>acteur 1</h3>
-                <p>bfegejhgfbfdjivfjfvdsgjfgdsjfgsdgfgsdgf</p>
-            </div>
-            <a href="">lire la suite</a>
-        </div>
-        <div class="acteur">
-            <p>
-                <h3>acteur 2</h3>
-            </p>
-        </div>
+        <?php
+
+            while ($data = $actors->fetch())
+            { ?>
+                <div class="acteur">
+                    <img id=actorlogo src="public/images/<?= htmlspecialchars($data['logo']) ?>" alt="<?= htmlspecialchars($data['name']) ?>" />
+                    <div class="contenu_acteurs">
+                        <h3><?= htmlspecialchars($data['acteur']) ?></h3>
+                        <p><?= mb_strimwidth($data['description'], 0, 100) ?>...</p>
+                    </div>
+                    <a href="?action=actor&id=<?= $data['id_acteur'] ?>">lire la suite</a>
+                </div>
+            <?php } 
+        ?>
     </div>
 </section>
 
-<?php $connectedSections = ob_get_clean(); ?>
+<?php $content = ob_get_clean(); ?>
 
-<?php require_once('template.php'); ?>
+<?php require('template.php'); ?>

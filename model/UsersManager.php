@@ -6,7 +6,7 @@ class UsersManager extends Manager
     public function passwordVerify($username, $password)
     {
         $db = $this->dbConnect();
-        $req = $db->prepare('SELECT id_user, nom, prenom, username, password FROM users WHERE username = :username');
+        $req = $db->prepare('SELECT id_user, nom, prenom, username, password FROM account WHERE username = :username');
         $req->execute(array('username' => $username));
         $userdata = $req->fetch();
 
@@ -15,24 +15,23 @@ class UsersManager extends Manager
 
     public function userConnect($username, $id, $hash, $firstname, $lastname)
     {
-        setcookie('firstname', $firstname, time() +30*24*3600, null, null, false, true);
-        setcookie('lastname', $lastname, time() + 30*24*3600, null, null, false, true);
-        setcookie('username', $username, time() + 30*24*3600, null, null, false, true);
-        setcookie('hash', $hash, time() + 30*24*3600, null, null, false, true);
-        $_SESSION['id'] = $id;
+        $_SESSION['firstname'] = $firstname;
+        $_SESSION['lastname'] = $lastname;
         $_SESSION['username'] = $username;
+        $_SESSION['hash'] = $hash;
+        $_SESSION['id'] = $id;
     }
 
     public function userVerify($userName, $firstName, $lastName)
     {
         $db = $this->dbConnect();
-        $req = $db->prepare('SELECT nom, prenom, username FROM users WHERE username= :username OR (prenom = :firstname AND nom = :lastname)');
+        $req = $db->prepare('SELECT nom, prenom, username FROM account WHERE username= :username OR (prenom = :firstname AND nom = :lastname)');
         $req->execute(array(
             'username' => $userName,
             'firstname' => $firstName,
             'lastname' => $lastName
         ));
-        $data = $req->fetch(PDO::FETCH_ASSOC);
+        $data = $req->fetch();
 
         return $data;
     }
@@ -43,7 +42,7 @@ class UsersManager extends Manager
         $answer = password_hash($answer, PASSWORD_DEFAULT);
 
         $db = $this->dbConnect();
-        $req = $db->prepare('INSERT INTO users(nom, prenom, username, password, question, reponse ) VALUES ( :lastname, :firstname, :username, :passwordhash, :question, :answer)');
+        $req = $db->prepare('INSERT INTO account(nom, prenom, username, password, question, reponse ) VALUES ( :lastname, :firstname, :username, :passwordhash, :question, :answer)');
         $userdata = $req->execute(array(
                             'username' => $username,
                             'firstname' => $firstname,
@@ -54,32 +53,6 @@ class UsersManager extends Manager
                             ));
         return $userdata;
 
-    }
-
-    public function masterPasswordVerify($username, $password)
-    {
-        $db = $this->dbConnect();
-        $req = $db->prepare('SELECT username, password FROM protection WHERE username = :username');
-        $req->execute(array('username' => $username));
-
-        $userdata = $req->fetch();
-
-        if($userdata)
-        {
-            $ispasswordcorrect = password_verify($password, $userdata['password']);
-            $hash = password_hash($username . time() . $password, PASSWORD_DEFAULT);
-
-            if($ispasswordcorrect){$this->authorisation($hash);}
-            else{throw new Exception('Mauvais username ou mot de passe');}
-
-        }
-        else{throw new Exception('Mauvais username ou mot de passe');}
-
-    }
-
-    private function authorisation($hash)
-    {
-        setcookie('unprotected', $hash, time() + 30*24*3600, null, null, false, true);
     }
 
 }

@@ -1,5 +1,7 @@
-<?php $title = 'page de connection'; ?>
-<?php ob_start(); ?>
+<?php
+session_start();
+ob_start(); ?>
+<?php $title = 'page de connexion'; ?>
 
 <section id=connexion>
     <P>
@@ -13,6 +15,6 @@
     </p>
 </section>
 
-<?php $connectionSection = ob_get_clean(); ?>
+<?php $content = ob_get_clean(); ?>
 
-<?php require_once('template.php'); ?>
+<?php require('template.php'); ?>

@@ -1,71 +1,83 @@
 <?php
 session_start();
+ob_start();
 require('controller/frontend.php');
 
 try
 {
-    if(isset($_GET['action']) && $_GET['action'] == 'unprotect')
+    if(isset($_GET['action']))
     {
-        if(!empty($_POST['username']) && !empty($_POST['password']))
+        switch($_GET['action'])
         {
-            unprotect($_POST['username'], $_POST['password']);
-        }    
-    }
-    if (isset($_COOKIE['unprotected']))
-    {
-        if (isset($_COOKIE['username']) && isset($_COOKIE['hash']))
-        {
-            require('view/frontend/connectedView.php');
-        }
-
-        if(isset($_GET['action']))
-        {
-            if($_GET['action'] == 'test')
-            {
+            case "register" :
                 if (!empty($_POST['username']) && !empty($_POST['firstname']) && !empty($_POST['lastname']) && !empty($_POST['password']) && !empty($_POST['question']) && !empty($_POST['answer']))
                 {
-                    foreach ($_POST as $post => $data)
+                    foreach ($_POST as $post)
                     {
                         $_POST[$post] = htmlspecialchars($_POST[$post]);
                     }
-                    registerUser($_POST['username'], $_POST['firstname'], $_POST['lastname'],$_POST['password'], $_POST['question'], $_POST['answer']);
-                }
-                else{
-                    require('view/frontend/newUserView.php');
-                    
-                }
-            }
 
-            elseif($_GET['action'] == 'connect')
-            {
+                    registerUser($_POST['username'], $_POST['firstname'], $_POST['lastname'],$_POST['password'], $_POST['question'], $_POST['answer']);
+                break;
+                }
+                else
+                {
+                    register();                        
+                }
+            break;
+
+            case 'connect' :
                 if (!empty($_POST['username']) && !empty($_POST['password']))
                 {
-                    require('view/frontend/connectView.php');
+                    foreach ($_POST as $post)
+                    {
+                        $_POST[$post] = htmlspecialchars($_POST[$post]);
+                    }
                     connectUser($_POST['username'], $_POST['password']);
                 }
                 else
                 {
-                    require('view/frontend/connectView.php');
+                    connect();
                 }
-            }
-            
-            elseif($_GET['action'] == 'deconnect')
-            {
-                session_destroy();
-                setcookie('username', "", time() - 3600);
-                setcookie('hash', "", time() - 3600);
-                setcookie('firstname', "", time() - 3600);
-                setcookie('lastname', "", time() - 3600);
-                header('Location: index.php');
-            }
+            break;
 
+            case 'disconnect' :
+                destroyCookies();
+            break;
+
+            case 'actor':
+                if(isset($_GET['id']))
+                {
+                    $_GET['id'] = (int) $_GET['id'];
+                    showActor();
+                }
+                else{throw new Exception('Aucun id d\'acteur renseigné !');}
+            break;
+
+            case 'addComment' :
+                if(isset($_POST['comment'], $_GET['id']))
+                {
+                    $_GET['id'] = (int) $_GET['id'];
+                    $_SESSION['id'] = (int) $_SESSION['id'];
+                    $_POST['comment'] = htmlspecialchars($_POST['comment']);
+
+                    addComment($_SESSION['id'], $_GET['id'], $_POST['comment']);
+                }
+                else{throw new Exception('probleme de formulaire');}
+            break;
+        }
+    }
+    else {
+
+        if(!empty($_SESSION['username']))
+        {
+            listActors();
         }
         else
         {
-            require('view/frontend/connectView.php');
+            connect();
         }
     }
-    else{require('view/frontend/protectionView.php');}
 }
 
 catch (Exception $e)
