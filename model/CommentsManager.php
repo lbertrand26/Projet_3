@@ -3,10 +3,21 @@ require_once('Manager.php');
 
 class CommentsManager extends Manager
 {
+    public function getNbComments()
+    {
+        $db = $this->dbConnect();
+        $req = $db->prepare('SELECT COUNT(*) AS nbComments FROM post WHERE id_acteur = ?');
+        $req->execute([$_GET['id']]);
+
+        $nbComments = $req->fetch(PDO::FETCH_ASSOC)['nbComments'];
+
+        return $nbComments;
+
+    }
     public function getComments($actorId)
     {
         $db = $this->dbConnect();
-        $comments = $db->prepare('SELECT p.id_post id_post, p.id_user id_user, p.post post, p.id_acteur id_acteur, a.prenom prenom, DATE_FORMAT(date_add, \'%d/%m/%Y à %Hs%imin%Ss\') datetimefr FROM post p INNER JOIN account a ON a.id_user = p.id_user WHERE p.id_acteur = ? ');
+        $comments = $db->prepare('SELECT p.id_post id_post, p.id_user id_user, p.post post, p.id_acteur id_acteur, a.prenom prenom, DATE_FORMAT(date_add, \'%d/%m/%Y à %H:%i\') datetimefr FROM post p INNER JOIN account a ON a.id_user = p.id_user WHERE p.id_acteur = ? ');
         $comments->execute([$actorId]);
 
         return $comments;
@@ -20,7 +31,7 @@ class CommentsManager extends Manager
             'userid' => $userId,
             'actorId' => $actorId
         ));
-        $isNotPossible= $req->fetch();
+        $isNotPossible = $req->fetch();
 
         if ($isNotPossible)
         {

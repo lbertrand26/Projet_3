@@ -8,7 +8,7 @@ class ActorsManager extends Manager
         $db = $this->dbConnect();
         $req = $db->query('SELECT * FROM acteur');
 
-        return  $req;
+        return $req;
     }
 
     public function getActor($actorId)
@@ -16,8 +16,10 @@ class ActorsManager extends Manager
         $db = $this->dbConnect();
         $req = $db->prepare('SELECT * FROM acteur WHERE id_acteur = ?');
         $req->execute([$actorId]);
-        $actor = $req->fetch();
 
-        return $actor;
+        $actor = $req->fetch();
+        $actor['description'] = nl2br($actor['description']);
+
+        if($actor == NULL){throw new Exception('Id acteur non existant');}else{return $actor;}
     }
 }

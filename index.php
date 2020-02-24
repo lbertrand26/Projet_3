@@ -2,21 +2,18 @@
 session_start();
 ob_start();
 require('controller/frontend.php');
+dataSecure();
 
 try
 {
+
     if(isset($_GET['action']))
     {
         switch($_GET['action'])
         {
-            case "register" :
+            case 'register' :
                 if (!empty($_POST['username']) && !empty($_POST['firstname']) && !empty($_POST['lastname']) && !empty($_POST['password']) && !empty($_POST['question']) && !empty($_POST['answer']))
                 {
-                    foreach ($_POST as $post)
-                    {
-                        $_POST[$post] = htmlspecialchars($_POST[$post]);
-                    }
-
                     registerUser($_POST['username'], $_POST['firstname'], $_POST['lastname'],$_POST['password'], $_POST['question'], $_POST['answer']);
                 break;
                 }
@@ -26,19 +23,12 @@ try
                 }
             break;
 
+            case 'profile' :
+                setUserSettings();
+            break;
+
             case 'connect' :
-                if (!empty($_POST['username']) && !empty($_POST['password']))
-                {
-                    foreach ($_POST as $post)
-                    {
-                        $_POST[$post] = htmlspecialchars($_POST[$post]);
-                    }
-                    connectUser($_POST['username'], $_POST['password']);
-                }
-                else
-                {
-                    connect();
-                }
+                connectUser();
             break;
 
             case 'disconnect' :
@@ -46,10 +36,9 @@ try
             break;
 
             case 'actor':
-                if(isset($_GET['id']))
+                if(!empty($_GET['id']))
                 {
-                    $_GET['id'] = (int) $_GET['id'];
-                    showActor();
+                    if(isUserConnected() == TRUE){showActor();}else{connectUser();}
                 }
                 else{throw new Exception('Aucun id d\'acteur renseigné !');}
             break;
@@ -57,13 +46,21 @@ try
             case 'addComment' :
                 if(isset($_POST['comment'], $_GET['id']))
                 {
-                    $_GET['id'] = (int) $_GET['id'];
-                    $_SESSION['id'] = (int) $_SESSION['id'];
-                    $_POST['comment'] = htmlspecialchars($_POST['comment']);
-
                     addComment($_SESSION['id'], $_GET['id'], $_POST['comment']);
                 }
                 else{throw new Exception('probleme de formulaire');}
+            break;
+
+            case 'likedislike' :
+                likeDislike();
+            break;
+
+            case 'resetPassword' :
+                resetPassword();
+            break;
+
+            default:
+                throw new Exception('action non éxistante envoyée !!');
             break;
         }
     }
@@ -75,12 +72,12 @@ try
         }
         else
         {
-            connect();
+            connectUser();
         }
     }
 }
 
 catch (Exception $e)
 {
-    echo 'Erreur : ' . $e->getMessage();
+    $erreur = $e->getMessage();
 }
