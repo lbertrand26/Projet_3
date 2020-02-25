@@ -14,38 +14,33 @@
 <section id="comments">
     <div class='commentsTitle'>
         <h2><?= $nbComments . ' ' ?>Commentaires</h2>
-        <div id="addComment">
-        <?php if(!isset($_POST['comment'])){ echo $_POST['comment']; ?>
-        <form id="comment" action="?action=actor&id=<?= $_GET['id'] ?>#comment" method="post"><input type="hidden" value="1" id="comment" name="comment"><input type="submit" value="Nouveau Commentaire"></form>
-    
-    <?php } ?>
-    <?php
-        if(isset($_POST['comment']) and $_POST['comment'] == 1)
-        {
-            ?><form id="comment" action="?action=actor&id=<?= $_GET['id'] ?>#comment" method="post"><input type="submit" value="fermer"></form><?php
+        <?php
+            if($_GET['comment'] == 1)
+            {
             include('view/frontend/commentView.php');
-        } 
-    ?>
-    </div>
-        <p>
-            <?= $nbLikesDislikes['likes'] ?> | <?= $nbLikesDislikes['dislikes'] ?><br>
-            <a id="likedislike" href="?action=likedislike&vote=1&id=<?= $_GET['id'] ?>"><i class="fa<?= $userVote['thumbsup'] ?> fa-thumbs-up fa-2x" style="color:blue"></i></a> | <a id="likedislike" href="?action=likedislike&vote=2&id=<?= $_GET['id'] ?>"><i class="fa<?= $userVote['thumbsdown'] ?> fa-thumbs-down fa-2x" style="color:red"></i></a>
-        </p>
+            } 
+        ?>
+        <div id="commentRight">
+            <div id="addComment">
+                <?php if(!$_GET['comment']){?>
+                    <a id="comment" href="?action=actor&amp;id=<?= $_GET['id'] ?>&amp;comment=1#comment">Commenter</a>
+                <?php }else{ ?><a id="comment" href="?action=actor&id=<?= $_GET['id'] ?>#comment">Fermer</a><?php } ?>
+            </div>
+            <p>
+                <?= $nbLikesDislikes['likes'] ?> | <?= $nbLikesDislikes['dislikes'] ?><br>
+                <a id="likedislike" href="?action=likedislike&vote=1&amp;id=<?= $_GET['id'] ?>&amp;comment=<?= $_GET['comment'] ?>"><i class="fa<?= $userVote['thumbsup'] ?> fa-thumbs-up fa-2x" style="color:blue"></i></a> <a id="likedislike" href="?action=likedislike&vote=2&id=<?= $_GET['id'] ?>&comment=<?= $_GET['comment'] ?>"><i class="fa<?= $userVote['thumbsdown'] ?> fa-thumbs-down fa-2x" style="color:red"></i></a>
+            </p>
+        </div>
     </div>
     <?php
         $nbComments = 0;
         while ($comment = $comments->fetch())
         { ?>
             <div class="comment">
-            <h3><?= $comment['prenom'] ?><br><?= $comment['datetimefr'] ?></h3>
-            <p><?= $comment['post'] ?></p>
-        </div>
+                <h3><?= $comment['prenom'] ?><br><?= $comment['datetimefr'] ?></h3>
+                <p><?= $comment['post'] ?></p>
+            </div>
         <?php } ?>
-        </div>
-
-
-
-    </p>
 </section>
 <?php $content = ob_get_clean(); ?>
 

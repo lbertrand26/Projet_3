@@ -5,7 +5,6 @@
         <meta charset="utf-8" />
         <title><?php if(isset($title)){echo $title;} ?></title>
         <link href="public/css/style.css" rel="stylesheet"> 
-        <link href="public/css/profile.css" rel="stylesheet">
         <link href="public/fontawesome/css/all.min.css" rel="stylesheet">
         <link rel="apple-touch-icon" sizes="57x57" href="public/images/favicons/apple-icon-57x57.png">
         <link rel="apple-touch-icon" sizes="60x60" href="public/images/favicons/apple-icon-60x60.png">
@@ -32,8 +31,8 @@
             <header>
                 <a href=index.php><img src="public/images/logo_gbaf.png" alt="logo" id="logo_gbaf" /></a>
                 <nav id="connect">
-                    <p><?php if(!empty($_SESSION)){?><i class="gg-profile"></i>&nbsp;<?= $_SESSION['lastname'] . ' ' . $_SESSION['firstname'] ?><?php } ?></p>
-                    <?php if(!empty($_SESSION)){?><a id="disconnect" href="?action=disconnect">Déconnexion </a><?php } ?>
+                    <p><?php if(!empty($_SESSION)){?><i class="far fa-user-circle" style="color:red"></i>&nbsp;<?= $_SESSION['lastname'] . ' ' . $_SESSION['firstname'] ?><?php } ?></p>
+                    <?php if(!empty($_SESSION)){?><a id="disconnect" href="?action=disconnect">Déconnexion </a><br><?php } ?>
                     <?php if(!empty($_SESSION)){?><a href="?action=profile">Modifier le profil</a><?php } ?>
                     <?php if(empty($_SESSION)){?><a href="?action=connect">Connection</a><?php } ?>
                     <?php if(empty($_SESSION)){?><a href="?action=register">Inscription</a><?php } ?>

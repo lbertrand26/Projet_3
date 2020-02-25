@@ -6,78 +6,77 @@ dataSecure();
 
 try
 {
-
-    if(isset($_GET['action']))
+    
+    if(!empty($_SESSION))
     {
-        switch($_GET['action'])
+
+        if(isset($_GET['action']))
         {
-            case 'register' :
-                if (!empty($_POST['username']) && !empty($_POST['firstname']) && !empty($_POST['lastname']) && !empty($_POST['password']) && !empty($_POST['question']) && !empty($_POST['answer']))
-                {
-                    registerUser($_POST['username'], $_POST['firstname'], $_POST['lastname'],$_POST['password'], $_POST['question'], $_POST['answer']);
+            switch($_GET['action'])
+            {
+                case 'register' :
+                    if (!empty($_POST['username']) && !empty($_POST['firstname']) && !empty($_POST['lastname']) && !empty($_POST['password']) && !empty($_POST['question']) && !empty($_POST['answer']))
+                    {
+                        registerUser($_POST['username'], $_POST['firstname'], $_POST['lastname'],$_POST['password'], $_POST['question'], $_POST['answer']);
+                    break;
+                    }
+                    else
+                    {
+                        register();                        
+                    }
                 break;
-                }
-                else
-                {
-                    register();                        
-                }
-            break;
 
-            case 'profile' :
-                setUserSettings();
-            break;
+                case 'profile' :
+                    setUserSettings();
+                break;
 
-            case 'connect' :
-                connectUser();
-            break;
+                case 'connect' :
+                    connectUser();
+                break;
 
-            case 'disconnect' :
-                destroyCookies();
-            break;
+                case 'disconnect' :
+                    destroyCookies();
+                break;
 
-            case 'actor':
-                if(!empty($_GET['id']))
-                {
-                    if(isUserConnected() == TRUE){showActor();}else{connectUser();}
-                }
-                else{throw new Exception('Aucun id d\'acteur renseigné !');}
-            break;
+                case 'actor':
+                    if(!empty($_GET['id']))
+                    {
+                        if(isUserConnected() == TRUE){showActor();}else{connectUser();}
+                    }
+                    else{throw new Exception('Aucun id d\'acteur renseigné !');}
+                break;
 
-            case 'addComment' :
-                if(isset($_POST['comment'], $_GET['id']))
-                {
-                    addComment($_SESSION['id'], $_GET['id'], $_POST['comment']);
-                }
-                else{throw new Exception('probleme de formulaire');}
-            break;
+                case 'addComment' :
+                    if(isset($_POST['comment'], $_GET['id']))
+                    {
+                        addComment($_SESSION['id'], $_GET['id'], $_POST['comment']);
+                    }
+                    else{throw new Exception('probleme de formulaire');}
+                break;
 
-            case 'likedislike' :
-                likeDislike();
-            break;
+                case 'likedislike' :
+                    likeDislike();
+                break;
 
-            case 'resetPassword' :
-                resetPassword();
-            break;
+                case 'resetPassword' :
+                    resetPassword();
+                break;
 
-            default:
-                throw new Exception('action non éxistante envoyée !!');
-            break;
+                default:
+                    throw new Exception('action non éxistante envoyée !!');
+                break;
+            }
         }
+        else { listActors(); }
+        
     }
-    else {
-
-        if(!empty($_SESSION['username']))
-        {
-            listActors();
-        }
         else
         {
             connectUser();
         }
-    }
 }
 
 catch (Exception $e)
 {
-    $erreur = $e->getMessage();
+    echo $e->getMessage();
 }

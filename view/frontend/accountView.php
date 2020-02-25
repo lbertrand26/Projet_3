@@ -5,7 +5,7 @@ ob_start(); ?>
 
 <section id="settings">
     <P>
-        <form action="index.php?action=settings" method="post">
+        <form action="index.php?action=profile" method="post">
             <label for="username">Nom d'utilisateur</label><input type="text" id="username" name="username" value="<?= $userData['username'] ?>" ><br>
             
             <label for="firstname">Prénom</label><input type="text" id="prenom" readonly="true" value="<?= $userData['prenom'] ?>" ><br>
@@ -17,10 +17,12 @@ ob_start(); ?>
             <label for="reponse">Réponse à la question (sensible a la case)</label><input type="text" id="reponse" name="reponse"><br>
             <input type="hidden" name="id_user" id="id_user" value="<?= $_SESSION['id'] ?>">
             <input type="submit" value="Modifier">
+            <?php if(isset($message)){echo $message; } ?>
 
         </form>
     </p>
 </section>
+
 
 <?php $content = ob_get_clean(); ?>
 

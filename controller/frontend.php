@@ -87,8 +87,8 @@ function destroyCookies()
     session_destroy();
     setcookie('username');
     setcookie('hash');
-    setcookie('unprotected');
-    header('Location: index.php');
+
+    connectUser();
 }
 
 
@@ -120,11 +120,12 @@ function addComment($userId, $actorId, $com)
 {
     $commentsManager = new CommentsManager();
 
-    $commentPosted = $commentsManager->setComment($userId, $actorId, $_POST['comment']);
+    $commentPosted = $commentsManager->setComment($userId, $actorId, $com);
 
     if ($commentPosted === false) {
         throw new Exception('Impossible d\'ajouter le commentaire !');
     }
+
     else {
         header('Location: index.php?action=actor&id=' . $actorId);
     }
@@ -133,9 +134,9 @@ function addComment($userId, $actorId, $com)
 function likeDislike()
 {
     $likesManager = new LikesManager();
-    $test = $likesManager->setlikeDislike($_GET['id'], $_SESSION['id'], $_GET['vote']);
+    $likedislike = $likesManager->setlikeDislike($_GET['id'], $_SESSION['id'], $_GET['vote']);
 
-    header('Location: ?action=actor&id=' . $_GET['id'] . '#likedislike');
+    header('Location: ?action=actor&id=' . $_GET['id'] . '&comment=' . $_GET['comment'] . '#likedislike');
 }
 
 function resetPassword()
@@ -158,16 +159,16 @@ function resetPassword()
 
 function setUserSettings()
 {
-    unset($new);
     $usersManager = new UsersManager();
     $userData = $usersManager->getUser($_SESSION['username']);
 
     if(!empty($_POST))
     {
-        $isPasswordCorrect = password_verify($_POST['password'], $userData['password']);
 
+        $isPasswordCorrect = password_verify($_POST['password'], $userData['password']);
         if($isPasswordCorrect)
-        {                
+        {
+            $password = $_POST['password'];
             $_POST['password'] = $_POST['newPassword']; 
             
             foreach($userData as $key => $value)
@@ -176,18 +177,25 @@ function setUserSettings()
                 {
                     $newValues[$key] = $value;
                 }
+                else{$newValues[$key] = $_POST[$key];}
+
             }
 
-            if(!empty($_POST['reponse'])){$newValues['reponse'] = password_hash($_POST['reponse'], PASSWORD_DEFAULT);} 
-            if(!empty($_POST['newPassword'])){$newValues['password'] = password_hash($_POST['password'], PASSWORD_DEFAULT);}      
-
+            if(!empty($_POST['reponse'])){$newValues['reponse'] = password_hash($_POST['reponse'], PASSWORD_DEFAULT);}
+            if(!empty($_POST['newPassword'])){$password = $_POST['newPassword'];$newValues['password'] = password_hash($_POST['password'], PASSWORD_DEFAULT);}   
             unset($newValues['nom'], $newValues['prenom']);
+            
+            $usersManager->setNewSettings($newValues);
 
-            $req = $usersManager->setNewSettings($newValues);
+            if(isset($_COOKIE)){$_POST['cookies'] = 1;}
 
+            $usersManager->userConnect($newValues['username'], $userData['password'], $userData['prenom'], $userData['nom'], $userData['id_user'],  $_POST['cookies']);
+            
+            $message = 'profil édité';
         }
-        else{setUserSettings();}
+        else{throw new Exception('password incorrect');}
                 
     }
     require('view/frontend/accountView.php');
+
 }
