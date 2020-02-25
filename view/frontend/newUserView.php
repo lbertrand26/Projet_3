@@ -1,7 +1,7 @@
 <?php
 session_start();
 ob_start(); ?>
-
+<?php if(!empty($error)){include('view/frontend/errorView.php');} ?>
 <section id="inscription">
     <P>
         <form action="index.php?action=register" method="post">
@@ -10,8 +10,7 @@ ob_start(); ?>
             <label for="lastname">Nom</label><input type="text" id="lastname" name="lastname" value="<?php if(isset($_POST['lastname'])){echo $_POST['lastname'];}?>" required><br>
             <label for="password">Mot de passe</label><input type="password" id="password" name="password" required><br>
             <label for="question">Question secrête</label><input type="text" id="question" name="question" value="<?php if(isset($_POST['question'])){echo $_POST['question'];}?>" required><br>
-            <label for="answer">Réponse à la question (sensible a la case)</label><input type="text" id="answer" name="answer"><br>
-            <?= $error ?>
+            <label for="answer">Réponse à la question (sensible a la casse)</label><input type="text" id="answer" name="answer"><br>
             <input type="submit">
 
         </form>

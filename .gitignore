@@ -3,4 +3,5 @@ model/Manager.php
 .htaccess
 test.php
 view/frontend/404.php
-
+public/fontawesome
+public/css/style-backup.css

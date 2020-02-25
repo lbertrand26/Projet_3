@@ -9,7 +9,7 @@
             </div>
         </div>
     </div>
-    <a href="index.php">Retour à la liste des partenaires</a>
+    <a id="backbuton" href="index.php">Retour</a>
 </section>
 <section id="comments">
     <div class='commentsTitle'>
@@ -23,7 +23,7 @@
         <div id="commentRight">
             <div id="addComment">
                 <?php if(!$_GET['comment']){?>
-                    <a id="comment" href="?action=actor&amp;id=<?= $_GET['id'] ?>&amp;comment=1#comment">Commenter</a>
+                    <a id="comment" href="?action=actor&amp;id=<?= $_GET['id'] ?>&amp;comment=1#comment"><?= $butonValue ?></a>
                 <?php }else{ ?><a id="comment" href="?action=actor&id=<?= $_GET['id'] ?>#comment">Fermer</a><?php } ?>
             </div>
             <p>

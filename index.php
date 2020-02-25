@@ -6,32 +6,14 @@ dataSecure();
 
 try
 {
-    
     if(!empty($_SESSION))
     {
-
         if(isset($_GET['action']))
         {
             switch($_GET['action'])
             {
-                case 'register' :
-                    if (!empty($_POST['username']) && !empty($_POST['firstname']) && !empty($_POST['lastname']) && !empty($_POST['password']) && !empty($_POST['question']) && !empty($_POST['answer']))
-                    {
-                        registerUser($_POST['username'], $_POST['firstname'], $_POST['lastname'],$_POST['password'], $_POST['question'], $_POST['answer']);
-                    break;
-                    }
-                    else
-                    {
-                        register();                        
-                    }
-                break;
-
                 case 'profile' :
                     setUserSettings();
-                break;
-
-                case 'connect' :
-                    connectUser();
                 break;
 
                 case 'disconnect' :
@@ -49,7 +31,7 @@ try
                 case 'addComment' :
                     if(isset($_POST['comment'], $_GET['id']))
                     {
-                        addComment($_SESSION['id'], $_GET['id'], $_POST['comment']);
+                        addComment($_GET['id'], $_POST['comment']);
                     }
                     else{throw new Exception('probleme de formulaire');}
                 break;
@@ -58,22 +40,26 @@ try
                     likeDislike();
                 break;
 
-                case 'resetPassword' :
-                    resetPassword();
-                break;
-
-                default:
-                    throw new Exception('action non éxistante envoyée !!');
-                break;
             }
         }
-        else { listActors(); }
-        
+        else{listActors();}
     }
-        else
+    else{
+        switch ($_GET['action'])
         {
-            connectUser();
+            case 'register' :
+                registerUser();                        
+            break;
+            case 'connect' :
+                connectUser();
+            break;
+            case 'resetPassword' :
+                resetPassword();
+            break;
+            default :
+                connectUser();
         }
+    }
 }
 
 catch (Exception $e)

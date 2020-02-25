@@ -23,7 +23,7 @@ class CommentsManager extends Manager
         return $comments;
     }
 
-    public function setComment($userId, $actorId, $com)
+    public function getComment($actorId, $userId)
     {
         $db = $this->dbConnect();
         $req = $db->prepare('SELECT * FROM post WHERE id_user = :userid AND id_acteur = :actorId');
@@ -31,24 +31,47 @@ class CommentsManager extends Manager
             'userid' => $userId,
             'actorId' => $actorId
         ));
-        $isNotPossible = $req->fetch();
+        $userComment = $req->fetch();
 
-        if ($isNotPossible)
-        {
-            throw new Exception('Vous avez déja commenté cet acteur/partenaire');
-        }
-        else
-        {
-            $comments = $db->prepare('INSERT INTO post(id_user, id_acteur, post) VALUES (:userid, :actorid, :comment)');
-            $commentPosted = $comments->execute(array(
-            'userid' => $userId,
-            'actorid' => $actorId,
-            'comment' => $com
-            ));
-
-            return $commentPosted;
-        }
+        return $userComment;
     }
 
+    public function setComment($userId, $actorId, $comment)
+    {
+        $db = $this->dbConnect();
+        $comments = $db->prepare('INSERT INTO post(id_user, id_acteur, post) VALUES (:userid, :actorid, :comment)');
+        $commentPosted = $comments->execute(array(
+            'userid' => $userId,
+            'actorid' => $actorId,
+            'comment' => $comment
+            ));
+
+        return $commentPosted;
+    }
+    
+    public function updateComment($userId, $actorId, $comment)
+    {
+        $db = $this->dbConnect();
+        $req = $db->prepare('UPDATE post SET post = :comment WHERE id_user = :userId AND id_acteur = :actorId');
+        $req->execute(array(
+            'comment' => $comment,
+            'userId' => $userId,
+            'actorId' => $actorId
+        ));
+
+        return $req;
+    }
+
+    public function deleteComment($userId, $actorId)
+    {
+        $db = $this->dbConnect();
+        $req = $db->prepare('DELETE FROM post WHERE id_user = :userId AND id_acteur = :actorId');
+        $req->execute(array(
+            'userId' => $userId,
+            'actorId' => $actorId
+        ));
+
+        return $req;
+    }
 
 }

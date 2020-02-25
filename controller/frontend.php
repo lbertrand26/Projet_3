@@ -31,54 +31,52 @@ function connectUser()
     {
         $usersManager = new UsersManager();
         $userData = $usersManager->getUser($_POST['username']);
-
         $isPasswordCorrect = password_verify($_POST['password'], $userData['password']);
 
         if(!$userData)
         {
-            header('Location: index.php?action=connect&error=1');
+            $error[] = 'Nom d\'utilisateur ou mot de passe incorrect';
         }
 
-        if($isPasswordCorrect)
+        elseif(!$isPasswordCorrect)
+        {
+            $error[] = 'Nom d\'utilisateur ou mot de passe incorrect';
+        }
+
+        if(empty($error))
         {
             $usersManager->userConnect($_POST['username'], $userData['password'], $userData['prenom'], $userData['nom'], $userData['id_user'],  $_POST['cookies']);
             header('Location: index.php');
         }
-        else{header('Location: index.php?action=connect&error=1');}
+
     }
     
     require('view/frontend/connectView.php');
     
 }
 
-function register()
+function registerUser()
 {
-    require('view/frontend/newUserView.php');
-}
-
-function registerUser($username, $firstname, $lastname, $password, $question, $answer)
-{
-    $usersManager = new UsersManager();
-    $data = $usersManager->userVerify($username, $firstname, $lastname);
-
-    if($data['username'] == $username)
+    if(!empty($_POST))
     {
-        $error = 'Le nom d\'utilisateur est déja utilisé';
+        $usersManager = new UsersManager();
+        $data = $usersManager->userVerify($_POST['username'], $_POST['firstname'], $_POST['lastname']);
+
+        if($data['username'] == $_POST['username'])
+        {
+            $error[] = 'Le nom d\'utilisateur est déja utilisé';
+        }
+
+        if($data['prenom'] == $_POST['firstname'] && $data['nom'] == $_POST['lastname'])
+        {
+            $error[] = 'Nom et Prénom déja enregistrés';
+        }
+
+        if(empty($error))
+        {
+            $userdata = $usersManager->userRegister($_POST['lastname'], $_POST['firstname'], $_POST['username'], $_POST['password'], $_POST['question'], $_POST['answer']);
+        }
     }
-
-    if($data['firstname'] == $firstname && $data['lastname'] == $lastname)
-    {
-        $error = 'Nom et prénom déja enregistrés';
-        /*throw new Exception('Nom et Prénom déjà enregistrés !');*/
-    }
-
-    $userdata = $usersManager->userRegister($lastname, $firstname, $username, $password, $question, $answer);
-
-    if(!$userdata)
-    {
-        throw new Exception('L \'utilisateur n\'a pas pu être enregistré');
-    }
-
     require('view/frontend/newUserView.php');
 }
 
@@ -107,28 +105,37 @@ function showActor()
     $likesManager = new LikesManager();
 
     $actor = $actorsManager->getActor($_GET['id']);
+
     $comments = $commentsManager->getComments($_GET['id']);
+    $userComment = $commentsManager->getComment($_GET['id'], $_SESSION['id']);
     $nbComments = $commentsManager->getNbComments($_GET['id']);
+    
     $nbLikesDislikes = $likesManager->getLikesDislikes($_GET['id']);
     $userVote = $likesManager->getUserVote($_GET['id'], $_SESSION['id']);
     
+    if(empty($userComment)){$butonValue = 'Commenter';}else{$butonValue = 'Editer';}
 
     require('view/frontend/actorView.php');
 }
 
-function addComment($userId, $actorId, $com)
+function addComment($actorId, $comment)
 {
     $commentsManager = new CommentsManager();
+    $userComment = $commentsManager->getComment($actorId, $_SESSION['id'] );
 
-    $commentPosted = $commentsManager->setComment($userId, $actorId, $com);
-
-    if ($commentPosted === false) {
-        throw new Exception('Impossible d\'ajouter le commentaire !');
+    if(!empty($userComment))
+    {
+        if(empty($comment)){$commentsManager->deleteComment($_SESSION['id'], $actorId);}
+        else{$commentsManager->updateComment($_SESSION['id'], $actorId, $comment);}
     }
 
-    else {
-        header('Location: index.php?action=actor&id=' . $actorId);
+    elseif(empty($userComment))
+    {
+        $commentPosted = $commentsManager->setComment($_SESSION['id'], $actorId, $comment);
     }
+
+    header('Location: index.php?action=actor&id=' . $actorId);
+    
 }
 
 function likeDislike()
@@ -191,9 +198,10 @@ function setUserSettings()
 
             $usersManager->userConnect($newValues['username'], $userData['password'], $userData['prenom'], $userData['nom'], $userData['id_user'],  $_POST['cookies']);
             
-            $message = 'profil édité';
+            $error = 'Profil modifié avec succès !';
         }
-        else{throw new Exception('password incorrect');}
+
+        $error[] = 'Mot de passe incorrect';
                 
     }
     require('view/frontend/accountView.php');
