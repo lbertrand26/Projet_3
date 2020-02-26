@@ -198,7 +198,7 @@ function setUserSettings()
 
             $usersManager->userConnect($newValues['username'], $userData['password'], $userData['prenom'], $userData['nom'], $userData['id_user'],  $_POST['cookies']);
             
-            $error = 'Profil modifié avec succès !';
+            $error[] = 'Profil modifié avec succès !';
         }
 
         $error[] = 'Mot de passe incorrect';
